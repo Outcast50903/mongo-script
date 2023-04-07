@@ -1,0 +1,6 @@
+dist/
+node_modules/
+logs/
+.env
+index-respaldo.js
+Libro1.xlsx
