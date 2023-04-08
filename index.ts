@@ -30,6 +30,7 @@ const main = async () => {
       inputRows.forEach(async row => {        
         const _id = new mongoose.Types.ObjectId(row.id);
         !mongoose.isValidObjectId(_id) && errId.push(row.id);
+        
         const reactivationDate = new Date(dayjs(row.reactivationDate).format('YYYY/MM/DD'));
         const action = row.action === 'CADUCAR' ? 'expire' : row.action === 'RENOVAR' ? 'renewal' : 'suspend';
         const contractActions = row.action === 'CADUCAR' 
