@@ -1,6 +1,5 @@
-import { ReturnModelType, mongoose } from "@typegoose/typegoose";
+import { ReturnModelType } from "@typegoose/typegoose";
 import { BeAnObject } from "@typegoose/typegoose/lib/types";
-import { MongoClient } from "mongodb";
 import { Collection } from "mongoose";
 
 export type FileType = {
@@ -11,8 +10,12 @@ export type FileType = {
 };
 
 export interface IMongoDB {
-  connect: () => Promise<MongoClient | typeof mongoose>;
-  createCollection: (collectionName: string) => Collection<mongoose.mongo.BSON.Document> | ReturnModelType<any, BeAnObject> | undefined;
+  createCollection?: (collectionName: string) => Collection<Document> | ReturnModelType<any, BeAnObject> | undefined;
+  createCollectionTypegoose?: <T>(cls: new (...args: any[]) => T) => ReturnModelType<any, BeAnObject> | undefined;
+  createBulk: <T>(
+    collection: ReturnModelType<new (...args: any[]) => T, BeAnObject> | Collection<Document>, 
+    bulkArr: any[],
+    collectionAlias: string
+  ) => Promise<void>;
   close: () => void;
-  createCollectionTypegoose?:<T> (cls: new (...args: any[]) => T) => ReturnModelType<any, BeAnObject> | undefined;
 }
