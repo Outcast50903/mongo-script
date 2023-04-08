@@ -5,7 +5,11 @@
     "module": "commonjs",
     "strict": true,
     "sourceMap": true,
-    // "baseUrl": "./",
+    "skipLibCheck": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "baseUrl": "./",
     // // "paths": {
     // //   "utils/*": ["utils/*"],
     // //   "types": ["types"],
