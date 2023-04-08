@@ -10,7 +10,6 @@ const createLog = (value: string | unknown) => {
   const filePath = join(dirname(require?.main?.filename ?? ''), 'logs', fileName);
   if (!existsSync(dirname(filePath))) mkdirSync(dirname(filePath), { recursive: true });
 
-  console.error(`Ha ocurrido un error: ${value}`);
   console.info(`por favor revisar el archivo de log: ${fileName}`);
   
   writeFileSync(filePath, `${value}`);
