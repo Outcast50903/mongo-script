@@ -2,12 +2,10 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import * as dayjs from 'dayjs'
 
-const getDateTime = () => dayjs().format('DDMMYYYYHHmmss')
-
 const createLog = (value: string | unknown) => {
   console.log("Creando log ...");
   
-  const fileName = `log_${getDateTime()}.txt`;  
+  const fileName = `log_${dayjs().format('DDMMYYYYHHmmss')}.json`;  
   
   const filePath = join(dirname(require?.main?.filename ?? ''), 'logs', fileName);
   if (!existsSync(dirname(filePath))) mkdirSync(dirname(filePath), { recursive: true });
