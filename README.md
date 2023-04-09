@@ -38,7 +38,7 @@ $ docker-compose up
 
 It's very important create a backup of the database before run the script.
 
-(Delete all documents in the collections)[https://docs.mongodb.com/manual/reference/method/db.collection.deleteMany/]
+[Delete all documents in the collections|](https://docs.mongodb.com/manual/reference/method/db.collection.deleteMany/)
 
 ```bash
 $ mongo db.contracts.deleteMany({}); 
