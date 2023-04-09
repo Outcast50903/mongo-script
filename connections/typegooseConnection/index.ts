@@ -39,10 +39,15 @@ export class TypegooseConnection implements IMongoDB {
   ) {
     try {
       const result = await collection?.bulkWrite(bulkArr, { ordered: false })
+      
       console.log(`Se han encontrado ${result.matchedCount} ${collectionAlias}`);
       console.log(`Se han modificado ${result.modifiedCount} ${collectionAlias}`);
       console.log(`Se han eliminado ${result.deletedCount} ${collectionAlias}`);
       console.log(`Se han insertado ${result.insertedCount} ${collectionAlias}`);
+
+      const notModified = result.insertedCount - result.modifiedCount;
+      notModified !== 0 && console.warn(`No se han modificado ${notModified} ${collectionAlias}`);
+
       console.log(result);
     } catch (error) {
       this.close();
