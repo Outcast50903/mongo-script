@@ -5,7 +5,7 @@ import * as dayjs from 'dayjs'
 const createLog = (value: string | unknown): void => {
   console.log('Creando log ...')
 
-  const fileName = `log_${dayjs().format('DDMMYYYYHHmmss')}.log`
+  const fileName = `log_${dayjs().format('DDMMYYYYHHmmss')}.json`
 
   const filePath = join(dirname(require?.main?.filename ?? ''), 'logs', fileName)
   if (!existsSync(dirname(filePath))) mkdirSync(dirname(filePath), { recursive: true })

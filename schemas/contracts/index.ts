@@ -1,5 +1,6 @@
 import { modelOptions, prop, mongoose } from '@typegoose/typegoose'
 
+@modelOptions({ schemaOptions: { _id: false } })
 export class UpdatedBy {
   @prop({ required: true })
   public updatedBy: mongoose.Types.ObjectId
