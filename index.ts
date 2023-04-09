@@ -81,6 +81,7 @@ const main = async () => {
     if (vehiclesBulkArr.length > 0 && contractBulkArr.length > 0) {
       await db.createBulk(vehiclesCollection, vehiclesBulkArr, 'vehículos');
       await db.createBulk(contractsCollection, contractBulkArr, 'contratos');
+      db.close();
     } else db.close();  
   } catch (error) {
     createLog(error) 

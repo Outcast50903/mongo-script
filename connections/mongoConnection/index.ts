@@ -45,7 +45,7 @@ export class MongoConnection implements IMongoDB {
         console.log(`Se han eliminado ${result.deletedCount} ${collectionAlias}`);
         console.log(`Se han insertado ${result.insertedCount} ${collectionAlias}`);
 
-        const notModified = result.insertedCount - result.modifiedCount;
+        const notModified = result.matchedCount - result.modifiedCount;
         notModified !== 0 && console.warn(`No se han modificado ${notModified} ${collectionAlias}`);
         
         console.log(result);
