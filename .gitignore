@@ -5,3 +5,5 @@ logs/
 index-respaldo.js
 backups/
 files/
+mongo/
+.DS_Store

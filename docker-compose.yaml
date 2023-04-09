@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  db:
+    image: mongo:3.6
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGODB_DATABASE: dev
+    volumes:
+      - ./mongo:/data/db
+volumes:
+  mongodb:
