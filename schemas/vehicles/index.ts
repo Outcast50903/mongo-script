@@ -24,6 +24,9 @@ export class Vehicles {
   public plateNumber: string;
   
   @prop()
+  public brand: string;
+  
+  @prop()
   public model: string;
   
   @prop()
@@ -33,7 +36,7 @@ export class Vehicles {
   public mainImageUrl?: string;
   
   @prop()
-  public isPremium: string;
+  public isPremium: boolean;
 
   @prop()
   public vin: string;
@@ -48,16 +51,22 @@ export class Vehicles {
   public qrDeviceId: string;
   
   @prop()
-  public typeCar: string;
-  
-  @prop()
   public deviceImei: boolean;
-  
+
   @prop()
   public mileage: number;
   
   @prop()
   public speedLimit: number;
+
+  @prop()
+  public vehicleEQ: boolean;
+
+  @prop()
+  public isContractSuspended: boolean;
+
+  @prop()
+  public groupId: number;
 }
 
 export default Vehicles;
