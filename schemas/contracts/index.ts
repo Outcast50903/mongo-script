@@ -1,5 +1,4 @@
 import { modelOptions, prop, mongoose } from "@typegoose/typegoose";
-import { ObjectId } from "mongodb";
 
 export class UpdatedBy {
   @prop({ required: true })
