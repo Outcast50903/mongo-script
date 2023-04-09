@@ -2,12 +2,11 @@ import * as dayjs from 'dayjs'
 import * as dotenv from 'dotenv'
 import { mongoose } from '@typegoose/typegoose'
 import { type AnyBulkWriteOperation } from 'mongodb'
+
+import { FileType } from './types'
 import { TypegooseConnection } from './connections'
-import { Contracts, type UpdatedBy, Vehicles } from './schemas'
-import readXLSXFile from './utils/readFile'
-import { type FileType } from './types'
-import createLog from './utils/createLog'
-import isValidVin from './utils/vinValidator'
+import { Contracts, UpdatedBy, Vehicles } from './schemas'
+import { createLog, isValidVin, readXLSXFile } from './utils'
 
 const main = async (): Promise<void> => {
   try {
