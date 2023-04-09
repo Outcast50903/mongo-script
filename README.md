@@ -36,13 +36,16 @@ $ docker-compose up
 
 ## MongoDB
 
-It's very important create a backup of the database before run the script.
+It's very important create a backup of the database before run the script, for this we recommended create `./backups` folder for save the backups.
+
+### Delete all documents in the collections
 
 [Delete all documents in the collections|](https://docs.mongodb.com/manual/reference/method/db.collection.deleteMany/)
 
 ```bash
-$ mongo db.contracts.deleteMany({}); 
-$ mongo db.vehicles.deleteMany({});
+$ use database
+$ db.contracts.deleteMany({}); 
+$ db.vehicles.deleteMany({});
 ```
 
 ## Usage
