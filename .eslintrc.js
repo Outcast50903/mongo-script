@@ -19,7 +19,7 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off'
   },
   settings: {
-    'import/extensions': ['.ts'],
+    'import/extensions': ['.ts', '.js'],
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts']
     },
