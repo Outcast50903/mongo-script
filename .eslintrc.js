@@ -19,16 +19,20 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off'
   },
   settings: {
-    'import/extensions': ['.ts', '.js'],
+    'import/extensions': ['.ts'],
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts']
     },
     'import/resolver': {
       node: {
-        extensions: ['.ts']
+        extensions: ['.js', '.jsx', '.ts', '.tsx']
       }
     }
   },
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint']
+  parserOptions: {
+    project: ['./tsconfig.json']
+  },
+  plugins: ['@typescript-eslint'],
+  eslintIgnore: ['./connections/**']
 }

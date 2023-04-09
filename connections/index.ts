@@ -1,7 +1,7 @@
-import { MongoConnection } from "./mongoConnection";
-import { TypegooseConnection } from "./typegooseConnection";
+import { MongoConnection } from './mongoConnection'
+import { TypegooseConnection } from './typegooseConnection'
 
 export {
   MongoConnection,
-  TypegooseConnection,
+  TypegooseConnection
 }

@@ -1,5 +1,5 @@
-const vinRegex = /^([A-Z\d]){17}$/;
+const vinRegex = /^([A-Z\d]){17}$/
 
-const isValidVin = (vin: string) => vinRegex.test(vin);
+const isValidVin = (vin: string): boolean => vinRegex.test(vin)
 
-export default isValidVin;
+export default isValidVin
