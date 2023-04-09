@@ -47,22 +47,25 @@ const main = async (): Promise<void> => {
       const updatedBy: UpdatedBy[] = [
         {
           updatedBy: new mongoose.Types.ObjectId(process.env.ADMIN_ID ?? ''),
-          updatedAt: new Date(dayjs().format('YYYY/MM/DD')),
+          updatedAt: new Date(),
           action
         }
       ]
 
       vehiclesBulkArr.push({
         updateOne: {
-          filter: { vin: row.vin },
-          update: { $set: { ...vehicleActions } }
+          filter: { vin: row.vin, enabled: true },
+          update: { $set: { modifiedAt: new Date(), ...vehicleActions } }
         }
       })
 
       contractBulkArr.push({
         updateOne: {
-          filter: { _id },
-          update: { $set: { updatedBy, ...contractActions } }
+          filter: { _id, enabled: true },
+          update: { 
+            $set: { modifiedAt: new Date(), ...contractActions },
+            // $push: { updatedBy: { $each: updatedBy, $sort: { score: -1 } } } 
+          }
         }
       })
     })
