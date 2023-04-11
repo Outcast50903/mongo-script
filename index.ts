@@ -6,10 +6,11 @@ import { type AnyBulkWriteOperation } from 'mongodb'
 import { FileType } from './types'
 import { TypegooseConnection } from './connections'
 import { Contracts, UpdatedBy, Vehicles } from './schemas'
-import { createLog, isValidVin, readXLSXFile } from './utils'
+import { createLog, isValidVin, readXLSXFile, findBackups } from './utils'
 
 const main = async (): Promise<void> => {
   try {
+    findBackups()
     const db = new TypegooseConnection()
     const contractsCollection = db.createCollectionTypegoose(Contracts)
     const vehiclesCollection = db.createCollectionTypegoose(Vehicles)
@@ -18,7 +19,7 @@ const main = async (): Promise<void> => {
     const vehiclesBulkArr: Array<AnyBulkWriteOperation<Vehicles>> = []
     const errId: FileType[] = []
 
-    const inputRows = readXLSXFile<FileType>(process.env.FILE_PATH ?? '')
+    const inputRows = readXLSXFile<FileType>(process.env.FILE_NAME ?? '')
     inputRows.map(async row => {
       if (!mongoose.isValidObjectId(row.id)) {
         errId.push(row)
