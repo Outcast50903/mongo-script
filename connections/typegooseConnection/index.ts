@@ -2,8 +2,9 @@ import { type ReturnModelType, getModelForClass, mongoose } from '@typegoose/typ
 import { type BeAnObject } from '@typegoose/typegoose/lib/types'
 import { type IMongoDB } from '../../types'
 import createLog from '../../utils/createLog'
+import dayjs = require('dayjs')
 
-export class TypegooseConnection implements IMongoDB {
+export class TypegooseConnection implements IMongoDB<new (...args: unknown[]) => any> {
   private client: typeof mongoose | undefined
 
   constructor () {
@@ -21,7 +22,7 @@ export class TypegooseConnection implements IMongoDB {
     )
   }
 
-  createCollectionTypegoose<T>(cls: new (...args: any[]) => T): ReturnModelType<new (...args: any[]) => T, BeAnObject> {
+  createCollection<T>(cls: new (...args: unknown[]) => T): ReturnModelType<new (...args: unknown[]) => T, BeAnObject> {
     console.log('Iniciando colección ...')
     return getModelForClass(cls)
   }
@@ -32,7 +33,7 @@ export class TypegooseConnection implements IMongoDB {
   }
 
   async createBulk<T>(
-    collection: ReturnModelType<new (...args: any[]) => T, BeAnObject>,
+    collection: ReturnModelType<new (...args: unknown[]) => T, BeAnObject>,
     bulkArr: any[],
     collectionAlias: string = 'documentos'
   ): Promise<void> {
@@ -51,6 +52,28 @@ export class TypegooseConnection implements IMongoDB {
     } catch (error) {
       this.close()
       createLog(error)
+    }
+  }
+
+  async validateChanges<T>(
+    collection: ReturnModelType<new (...args: unknown[]) => T, BeAnObject>,
+    query: Record<string, unknown>,
+  ) {
+    try {
+      const validateArray: unknown[] = []
+      const findDocuments = await collection.find(query).exec()      
+  
+      findDocuments.map(row => {  
+        // @ts-ignore
+        if(dayjs(row.modifiedAt).format('YYYY/MM/DD') !== dayjs().format('YYYY/MM/DD')) {
+          validateArray.push(row)
+        }
+      })
+      
+      console.log(`Se han encontrado ${validateArray.length} documentos sin modificar`)
+      validateArray.length !== 0 && createLog(JSON.stringify(validateArray, null, 2))
+    } catch (error) {
+      console.log(error);
     }
   }
 }

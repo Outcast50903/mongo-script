@@ -1,8 +1,8 @@
 import { type Collection, type Db, MongoClient } from 'mongodb'
 import { type IMongoDB } from '../../types'
 import createLog from '../../utils/createLog'
-export class MongoConnection implements IMongoDB {
-  private client: MongoClient | undefined
+export class MongoConnection implements IMongoDB<string> {
+  private client: MongoClient
   private db: Db | undefined
 
   constructor () {
@@ -10,19 +10,24 @@ export class MongoConnection implements IMongoDB {
   }
 
   private async connect (): Promise<void> {
-    console.clear()
-    console.log('-----------------------------------------------------------------------------------------------------')
-    console.log('Iniciando conexión de mongo ...')
-    this.client = await MongoClient.connect(
-      process.env.MONGO_URL ?? '',
-      // @ts-ignore
-      { useNewUrlParser: true, useUnifiedTopology: true }
-    )
-    this.db = this.client?.db(process.env.MONGO_DB ?? '')
+    try {
+      console.clear()
+      console.log('-----------------------------------------------------------------------------------------------------')
+      console.log('Iniciando conexión de mongo ...')
+      this.client = await MongoClient.connect(
+        process.env.MONGO_URL ?? '',
+        // @ts-ignore
+        { useNewUrlParser: true, useUnifiedTopology: true }
+      )
+    } catch (error) {
+      console.log('Error en la conexión de mongo');
+    }
   }
-
-  createCollection (collectionName: string): Collection<Document> | undefined {
+  
+  async createCollection(collectionName: string): Promise<Collection<Document>> {
     console.log('Iniciando colección ...')
+    this.client ?? await this.connect()
+    this.db = this.client.db(process.env.MONGO_DB ?? '')
     return this.db?.collection(collectionName)
   }
 

@@ -12,8 +12,8 @@ const main = async (): Promise<void> => {
   try {
     findBackups()
     const db = new TypegooseConnection()
-    const contractsCollection = db.createCollectionTypegoose(Contracts)
-    const vehiclesCollection = db.createCollectionTypegoose(Vehicles)
+    const contractsCollection = db.createCollection(Contracts)
+    const vehiclesCollection = db.createCollection(Vehicles)
 
     const contractBulkArr: Array<AnyBulkWriteOperation<Contracts>> = []
     const vehiclesBulkArr: Array<AnyBulkWriteOperation<Vehicles>> = []
@@ -33,24 +33,16 @@ const main = async (): Promise<void> => {
 
       const _id = new mongoose.Types.ObjectId(row.id)
       const reactivationDate = new Date(dayjs(row.reactivationDate).format('YYYY/MM/DD'))
-      const action = row.action === 'CADUCAR' ? 'expire' : row.action === 'RENOVAR' ? 'renewal' : 'suspend'
       const contractActions = row.action === 'CADUCAR'
-        ? { active: false, enabled: false, deletedAt: new Date(dayjs().format('YYYY/MM/DD')) }
+        ? { active: false, enabled: false, deletedAt: new Date() }
         : row.action === 'RENOVAR'
           ? { isPremium: true, reactivationDate }
           : { isPremium: false, reactivationDate }
       const vehicleActions = row.action === 'CADUCAR'
-        ? { enabled: false, deletedAt: new Date(dayjs().format('YYYY/MM/DD')) }
+        ? { enabled: false, deletedAt: new Date() }
         : row.action === 'RENOVAR'
           ? { isContractSuspended: false, isPremium: true }
           : { isContractSuspended: true, isPremium: false }
-      const updatedBy: UpdatedBy[] = [
-        {
-          updatedBy: new mongoose.Types.ObjectId(process.env.ADMIN_ID ?? ''),
-          updatedAt: new Date(),
-          action
-        }
-      ]
 
       vehiclesBulkArr.push({
         updateOne: {
@@ -62,24 +54,30 @@ const main = async (): Promise<void> => {
       contractBulkArr.push({
         updateOne: {
           filter: { _id, enabled: true },
-          update: { 
-            $set: { modifiedAt: new Date(), ...contractActions },
-            // $push: { updatedBy: { $each: updatedBy, $sort: { score: -1 } } } 
-          }
+          update: { $set: { modifiedAt: new Date(), ...contractActions } }
         }
       })
     })
 
-    console.log('Cantidad de registros de contratos a actualizar: ', contractBulkArr.length)
-    console.log('Cantidad de registros de vehículos a actualizar: ', vehiclesBulkArr.length)
-    console.log('Cantidad de registros totales a actualizar: ', contractBulkArr.length + vehiclesBulkArr.length)
+    console.log('Cantidad de registros de contratos y vehículos a actualizar: ', contractBulkArr.length)
+    console.log('Cantidad de registros totales a actualizar: ', contractBulkArr.length - errId.length)
 
-    console.log('Cantidad de registros con id inválido: ', errId.length)
+    console.log('Cantidad de registros con errores: ', errId.length)
     errId.length > 0 && createLog(JSON.stringify(errId))
 
     if (vehiclesBulkArr.length > 0 && contractBulkArr.length > 0) {
-      await db.createBulk(vehiclesCollection, vehiclesBulkArr, 'vehículos')
       await db.createBulk(contractsCollection, contractBulkArr, 'contratos')
+      await db.validateChanges(
+        contractsCollection, 
+        { _id: { $in: inputRows.map(row => new mongoose.Types.ObjectId(row.id)) }, enabled: true }
+      )
+      await db.createBulk<Vehicles>(vehiclesCollection, vehiclesBulkArr, 'vehículos')
+      await db.validateChanges(
+        vehiclesCollection, 
+        { vin: { $in: inputRows.map(row => { 
+          if (!isValidVin(row.vin)) return
+          return row.vin
+        }) }, enabled: true })
       db.close()
     } else db.close()
   } catch (error) {
