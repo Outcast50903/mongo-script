@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from 'fs'
-import { join, dirname } from 'path'
-import * as dayjs from 'dayjs'
+import { dirname, join } from 'path'
+
+import dayjs from 'dayjs'
 
 const createLog = (value: string | unknown): void => {
   console.log('Creando log ...')
