@@ -1,34 +1,44 @@
-import { type Collection, type Db, MongoClient } from 'mongodb'
-import { type IMongoDB } from '../../types'
-import createLog from '../../utils/createLog'
+import { type Collection, type Db, MongoClient, type MongoClientOptions, type Document } from 'mongodb'
+
+import { type IMongoDB } from '../../connections'
+import { createLog } from '../../utils'
+
 export class MongoConnection implements IMongoDB<string> {
   private client: MongoClient
   private db: Db | undefined
 
   constructor () {
-    this.connect().catch(error => { createLog(error) })
+    void (async () => await this.connect(process.env.MONGO_DB_NAME ?? ''))()
   }
 
-  private async connect (): Promise<void> {
+  async connect (dbName: string): Promise<MongoClient | undefined> {
     try {
-      console.clear()
-      console.log('-----------------------------------------------------------------------------------------------------')
-      console.log('Iniciando conexión de mongo ...')
-      this.client = await MongoClient.connect(
+      console.log('Initializing MongoDB connection...')
+      const connection = await MongoClient.connect(
         process.env.MONGO_URL ?? '',
-        // @ts-ignore
-        { useNewUrlParser: true, useUnifiedTopology: true }
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        { useNewUrlParser: true, useUnifiedTopology: true } as MongoClientOptions
       )
+
+      this.client = connection
+      this.db = this.client.db(dbName)
+      console.log('MongoDB connection established')
+
+      return connection
     } catch (error) {
-      console.log('Error en la conexión de mongo');
+      console.log('Error en la conexión de mongo')
+      return undefined
     }
   }
-  
-  async createCollection(collectionName: string): Promise<Collection<Document>> {
+
+  async createCollection (collectionName: string): Promise<Collection<Document>> {
     console.log('Iniciando colección ...')
-    this.client ?? await this.connect()
-    this.db = this.client.db(process.env.MONGO_DB ?? '')
-    return this.db?.collection(collectionName)
+    const collection = this.db?.collection<Document>(collectionName)
+    if (collection == null) {
+      throw new Error(`Collection ${collectionName} not found`)
+    }
+
+    return collection
   }
 
   close (): void {

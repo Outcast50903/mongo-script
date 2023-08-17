@@ -1,25 +1,38 @@
 import { type ReturnModelType, getModelForClass, mongoose } from '@typegoose/typegoose'
 import { type BeAnObject } from '@typegoose/typegoose/lib/types'
-import { type IMongoDB } from '../../types'
-import createLog from '../../utils/createLog'
-import dayjs = require('dayjs')
+import { type ConnectOptions } from 'mongoose'
 
-export class TypegooseConnection implements IMongoDB<new (...args: unknown[]) => any> {
+import { type IMongoDB } from '../../connections'
+import { createLog } from '../../utils'
+
+const statusConnection: Record<number, string> = {
+  0: 'Disconnected',
+  1: 'Connected',
+  2: 'Connecting',
+  3: 'Disconnecting'
+}
+
+export default class TypegooseConnection implements IMongoDB<new (...args: unknown[]) => any> {
   private client: typeof mongoose | undefined
 
   constructor () {
-    this.connect().catch(error => { createLog(error) })
+    void (async () => await this.connect(process.env.MONGO_DB_NAME ?? ''))()
   }
 
-  private async connect (): Promise<void> {
-    console.clear()
-    console.log('---------------------------------------------------------------------------------------------------')
-    console.log('Iniciando conexión de mongo ...')
-    this.client = await mongoose.connect(
-      process.env.MONGO_URL ?? '',
-      // @ts-ignore
-      { useNewUrlParser: true, useUnifiedTopology: true, dbName: process.env.MONGO_DB ?? '' }
-    )
+  async connect (dbName: string): Promise<typeof mongoose> {
+    console.log('Initializing MongoDB connection...')
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const connection = await mongoose.connect(process.env.MONGO_URL ?? '', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      dbName
+    } as ConnectOptions)
+
+    console.log(statusConnection[connection.connection.readyState])
+
+    this.client = connection
+
+    return connection
   }
 
   createCollection<T>(cls: new (...args: unknown[]) => T): ReturnModelType<new (...args: unknown[]) => T, BeAnObject> {
@@ -27,9 +40,9 @@ export class TypegooseConnection implements IMongoDB<new (...args: unknown[]) =>
     return getModelForClass(cls)
   }
 
-  close (): void {
+  async close (): Promise<void> {
     console.log('Desconectando ...')
-    this.client?.disconnect().catch(error => { createLog(error) })
+    await this.client?.disconnect()
   }
 
   async createBulk<T>(
@@ -50,30 +63,8 @@ export class TypegooseConnection implements IMongoDB<new (...args: unknown[]) =>
 
       console.log(result)
     } catch (error) {
-      this.close()
+      await this.close()
       createLog(error)
-    }
-  }
-
-  async validateChanges<T>(
-    collection: ReturnModelType<new (...args: unknown[]) => T, BeAnObject>,
-    query: Record<string, unknown>,
-  ) {
-    try {
-      const validateArray: unknown[] = []
-      const findDocuments = await collection.find(query).exec()      
-  
-      findDocuments.map(row => {  
-        // @ts-ignore
-        if(dayjs(row.modifiedAt).format('YYYY/MM/DD') !== dayjs().format('YYYY/MM/DD')) {
-          validateArray.push(row)
-        }
-      })
-      
-      console.log(`Se han encontrado ${validateArray.length} documentos sin modificar`)
-      validateArray.length !== 0 && createLog(JSON.stringify(validateArray, null, 2))
-    } catch (error) {
-      console.log(error);
     }
   }
 }
