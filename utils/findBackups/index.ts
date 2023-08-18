@@ -1,6 +1,11 @@
 import { existsSync, readdirSync } from 'fs'
 import { dirname, join } from 'path'
 
+/**
+ * Finds backups in the 'backups' directory of the project.
+ * @throws {Error} If the 'backups' directory does not exist or if there are no backups found.
+ * @returns {void}
+ */
 const findBackups = (): void => {
   if (!existsSync(join(dirname(require?.main?.filename ?? ''), 'backups'))) {
     throw new Error('Files directory does not exist')

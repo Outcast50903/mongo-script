@@ -3,9 +3,18 @@ import axios, { type AxiosInstance } from 'axios'
 import HttpClient from '../class'
 import { type HeaderType } from '../types'
 
+/**
+ * A class that extends HttpClient and provides methods for making HTTP requests using Axios.
+ * @extends HttpClient
+ */
 export class Api extends HttpClient {
   api: AxiosInstance
 
+  /**
+   * Creates an instance of Api.
+   * @param {string} baseUrl - The base URL for the API.
+   * @param {HeaderType} [headers] - The headers to be included in the requests.
+   */
   constructor (
     baseUrl: string,
     headers?: HeaderType
@@ -25,9 +34,15 @@ export class Api extends HttpClient {
 
       return config
     })
-    // this.api.defaults.headers.common['Authenticate'] = `${headers?.Authenticate}`
   }
 
+  /**
+   * Sends a GET request to the specified URL.
+   * @async
+   * @template TResponse - The expected response type.
+   * @param {string} url - The URL to send the request to.
+   * @returns {Promise<TResponse>} - A promise that resolves with the response data or null if an error occurs.
+   */
   async get<TResponse>(url: string): Promise<TResponse> {
     try {
       const { data } = await this.api.get<TResponse>(url)
@@ -37,6 +52,15 @@ export class Api extends HttpClient {
     }
   }
 
+  /**
+   * Sends a POST request to the specified URL with the provided body.
+   * @async
+   * @template TResponse - The expected response type.
+   * @template UBody - The type of the request body.
+   * @param {string} url - The URL to send the request to.
+   * @param {UBody} body - The request body.
+   * @returns {Promise<TResponse>} - A promise that resolves with the response data or null if an error occurs.
+   */
   async post<TResponse, UBody = null>(
     url: string,
     body: UBody
@@ -49,6 +73,15 @@ export class Api extends HttpClient {
     }
   }
 
+  /**
+   * Sends a PUT request to the specified URL with the provided body.
+   * @async
+   * @template TResponse - The expected response type.
+   * @template UBody - The type of the request body.
+   * @param {string} url - The URL to send the request to.
+   * @param {UBody} body - The request body.
+   * @returns {Promise<TResponse>} - A promise that resolves with the response data or null if an error occurs.
+   */
   async put<TResponse, UBody = null>(
     url: string,
     body: UBody
@@ -61,6 +94,15 @@ export class Api extends HttpClient {
     }
   }
 
+  /**
+   * Sends a PATCH request to the specified URL with the provided body.
+   * @async
+   * @template TResponse - The expected response type.
+   * @template UBody - The type of the request body.
+   * @param {string} url - The URL to send the request to.
+   * @param {UBody} body - The request body.
+   * @returns {Promise<TResponse>} - A promise that resolves with the response data or null if an error occurs.
+   */
   async patch<TResponse, UBody = null>(
     url: string,
     body: UBody
@@ -73,6 +115,13 @@ export class Api extends HttpClient {
     }
   }
 
+  /**
+   * Sends a DELETE request to the specified URL.
+   * @async
+   * @template TResponse - The expected response type.
+   * @param {string} url - The URL to send the request to.
+   * @returns {Promise<TResponse>} - A promise that resolves with the response data or null if an error occurs.
+   */
   async delete<TResponse>(
     url: string
   ): Promise<TResponse> {

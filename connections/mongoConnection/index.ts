@@ -1,16 +1,28 @@
-import { type Collection, type Db, MongoClient, type MongoClientOptions, type Document } from 'mongodb'
+import { MongoClient, type MongoClientOptions, type Db, type Collection, type Document } from 'mongodb'
 
 import { type IMongoDB } from '../../connections'
 import { createLog } from '../../utils'
 
+/**
+ * Class for MongoDB connection
+ * @implements IMongoDB
+ */
 export class MongoConnection implements IMongoDB<string> {
   private client: MongoClient
   private db: Db | undefined
 
+  /**
+   * Initializes the MongoDB connection
+   */
   constructor () {
     void (async () => await this.connect(process.env.MONGO_DB_NAME ?? ''))()
   }
 
+  /**
+   * Connects to the MongoDB database
+   * @param dbName - Name of the database to connect to
+   * @returns A Promise that resolves to a MongoClient object if the connection is successful, otherwise undefined
+   */
   async connect (dbName: string): Promise<MongoClient | undefined> {
     try {
       console.log('Initializing MongoDB connection...')
@@ -31,6 +43,12 @@ export class MongoConnection implements IMongoDB<string> {
     }
   }
 
+  /**
+   * Creates a new collection in the database
+   * @param collectionName - Name of the collection to create
+   * @returns A Promise that resolves to a Collection object if the collection is created successfully, otherwise
+   * throws an error
+   */
   async createCollection (collectionName: string): Promise<Collection<Document>> {
     console.log('Iniciando colección ...')
     const collection = this.db?.collection<Document>(collectionName)
@@ -41,11 +59,21 @@ export class MongoConnection implements IMongoDB<string> {
     return collection
   }
 
+  /**
+   * Closes the MongoDB connection
+   */
   close (): void {
     console.log('Desconectando ...')
     this.client?.close().catch((error: unknown) => { createLog(error) })
   }
 
+  /**
+   * Creates multiple documents in a collection using bulk write
+   * @param collection - Collection object to insert documents into
+   * @param bulkArr - Array of documents to insert
+   * @param collectionAlias - Optional alias for the collection name
+   * @returns A Promise that resolves to void if the documents are inserted successfully, otherwise throws an error
+   */
   async createBulk (
     collection: Collection<Document>,
     bulkArr: any[],

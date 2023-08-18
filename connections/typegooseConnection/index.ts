@@ -12,13 +12,25 @@ const statusConnection: Record<number, string> = {
   3: 'Disconnecting'
 }
 
+/**
+ * Class for MongoDB connection
+ * @implements IMongoDB
+ */
 export default class TypegooseConnection implements IMongoDB<new (...args: unknown[]) => any> {
   private client: typeof mongoose | undefined
 
+  /**
+   * Creates an instance of TypegooseConnection and connects to the MongoDB database.
+   */
   constructor () {
     void (async () => await this.connect(process.env.MONGO_DB_NAME ?? ''))()
   }
 
+  /**
+   * Connects to the MongoDB database.
+   * @param dbName - The name of the database to connect to.
+   * @returns A Promise that resolves to the Mongoose connection object.
+   */
   async connect (dbName: string): Promise<typeof mongoose> {
     console.log('Initializing MongoDB connection...')
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -35,16 +47,32 @@ export default class TypegooseConnection implements IMongoDB<new (...args: unkno
     return connection
   }
 
+  /**
+   * Creates a new collection in the database.
+   * @param cls - The class representing the model to be used with the collection.
+   * @returns A Mongoose model object for the collection.
+   */
   createCollection<T>(cls: new (...args: unknown[]) => T): ReturnModelType<new (...args: unknown[]) => T, BeAnObject> {
     console.log('Iniciando colección ...')
     return getModelForClass(cls)
   }
 
+  /**
+   * Closes the connection to the database.
+   * @returns A Promise that resolves when the connection is closed.
+   */
   async close (): Promise<void> {
     console.log('Desconectando ...')
     await this.client?.disconnect()
   }
 
+  /**
+   * Creates multiple documents in a collection using bulk write operations.
+   * @param collection - The Mongoose model object for the collection.
+   * @param bulkArr - An array of objects representing the documents to be created.
+   * @param collectionAlias - An optional string representing the name of the collection.
+   * @returns A Promise that resolves when the bulk write operation is complete.
+   */
   async createBulk<T>(
     collection: ReturnModelType<new (...args: unknown[]) => T, BeAnObject>,
     bulkArr: any[],

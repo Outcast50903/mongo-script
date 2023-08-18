@@ -3,6 +3,11 @@ import { dirname, join } from 'path'
 
 import dayjs from 'dayjs'
 
+/**
+ * Creates a log file with the given value.
+ * @param value - The value to be logged.
+ * @returns void
+ */
 const createLog = (value: string | unknown): void => {
   console.log('Creando log ...')
 
