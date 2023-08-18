@@ -67,7 +67,7 @@ export default class TypegooseConnection implements IMongoDB<new (...args: unkno
   }
 
   /**
-   * Creates multiple documents in a collection using bulk write operations.
+   * Modify multiple documents in a collection using bulk write operations.
    * @param collection - The Mongoose model object for the collection.
    * @param bulkArr - An array of objects representing the documents to be created.
    * @param collectionAlias - An optional string representing the name of the collection.

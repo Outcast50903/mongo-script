@@ -47,7 +47,7 @@ const main = async (db: TypegooseConnection): Promise<void> => {
     }
 
     if (usersBulkArr.length > 0) {
-      await db.createBulk(usersCollection, usersBulkArr, 'ConsumerVehicles')
+      await db.createBulk(usersCollection, usersBulkArr, 'users')
     }
 
     await db.close()
